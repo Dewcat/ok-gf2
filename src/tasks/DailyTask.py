@@ -72,7 +72,9 @@ class DailyTask(CommunityMixin, BaseGfTask):
                 '自动进入限时开启活动并挑战物资关卡\n'
                 '关卡名称在"当前物资关卡名称"中配置'
             ),
-            '活动层': '自动完成活动层中的喝水、吃饭和奖励领取流程',
+            '活动层': '活动层总开关；按下方独立开关执行喝水、吃饭，并领取奖励',
+            '活动层喝水': '独立控制喝水任务，关闭后跳过喝水',
+            '活动层吃饭': '独立控制吃饭任务，关闭后跳过吃饭',
             '公共区/调度室': '自动完成公共区委托的派遣与领取',
             '自主循环': (
                 '开启后公共区将启动游戏内自主循环模式\n'
@@ -102,6 +104,8 @@ class DailyTask(CommunityMixin, BaseGfTask):
             '闪耀星愿': False,
             '活动自律': True,
             '活动层': True,
+            '活动层喝水': True,
+            '活动层吃饭': True,
             '公共区/调度室': True,
             '自主循环': False,
             '购买免费礼包': True,
@@ -133,7 +137,9 @@ class DailyTask(CommunityMixin, BaseGfTask):
         self.default_config_group.update({
             "社区每日": ["用户名", "密码"],
             "活动自律": ["当前物资关卡名称"],
-            "活动层": ["喝水", "吃饭"],
+            "活动层": ["活动层喝水", "活动层吃饭"],
+            "活动层喝水": ["喝水"],
+            "活动层吃饭": ["吃饭"],
             "公共区/调度室": ["自主循环"],
             "自主循环跳过项": ["自动刷体力", "刷钱本", "竞技场"],
             "购买免费礼包": ["商店心愿单购买"],
@@ -274,6 +280,10 @@ class DailyTask(CommunityMixin, BaseGfTask):
     def free_time_layer(self):
         self.info_set('current_task', 'free_time_layer')
         for i in range(3):
+            if i == 0 and not self.config.get('活动层喝水', True):
+                continue
+            if i == 1 and not self.config.get('活动层吃饭', True):
+                continue
             self.wait_click_ocr(match='活动层', box=self.box.right, time_out=2, raise_if_not_found=True)
             if self.is_free_layer():
                 if i == 0:
