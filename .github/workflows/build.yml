@@ -1,237 +1,91 @@
-name: Build
+name: Build fork release
 
 on:
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
       - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  build:
     runs-on: windows-latest
-    permissions:
-      contents: read
-
+    timeout-minutes: 90
     env:
-      PYTHONIOENCODING: 'UTF-8'
-
-    strategy:
-      matrix:
-        python-version: [ 3.12 ]
-
+      PYTHONIOENCODING: UTF-8
     steps:
-      - name: Configure git
-        run: |
-          [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-          git config --global user.email "ok-oldking@users.noreply.github.com"
-          git config --global user.name "ok-oldking"
-          echo "action_state=yellow" >> $env:GITHUB_ENV
-          echo "${{ env.action_state }}"
-
       - uses: actions/checkout@v4
         with:
           lfs: true
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Set UTF-8 encoding
-        run: |
-          set PYTHONIOENCODING=utf-8
-          set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          echo PYTHONIOENCODING=utf-8 >> $GITHUB_ENV
-
+          python-version: '3.12'
+          cache: pip
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install cython setuptools polib
-
-      - name: inline_ok_requirements #把ok-script加入源码, 从requirements.txt中删除以提高升级更新速度
-        run: |
-          python -m ok.update.inline_ok_requirements --tag ${{ github.ref_name }}
-
+          python -m pip install -r requirements.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip install cython setuptools polib
       - name: Run tests
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           Get-ChildItem -LiteralPath tests -Filter "Test*.py" | Sort-Object Name | ForEach-Object {
-            $module = "tests.$([System.IO.Path]::GetFileNameWithoutExtension($_.Name))"
-            python -u -m unittest $module -v
+            python -u -m unittest discover -s tests -p $_.Name -v
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
-
-  sync:
-    needs: test
-    runs-on: windows-latest
-    permissions:
-      contents: read
-    outputs:
-      start_tag: ${{ steps.sync.outputs.start_tag }}
-      end_tag: ${{ steps.sync.outputs.end_tag }}
-      changes_with_asterisk: ${{ steps.sync.outputs.changes_with_asterisk }}
-
-    env:
-      PYTHONIOENCODING: 'UTF-8'
-
-    strategy:
-      matrix:
-        python-version: [ 3.12 ]
-
-    steps:
-      - name: Configure git
-        run: |
-          [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-          git config --global user.email "ok-oldking@users.noreply.github.com"
-          git config --global user.name "ok-oldking"
-          echo "action_state=yellow" >> $env:GITHUB_ENV
-          echo "${{ env.action_state }}"
-
-      - uses: actions/checkout@v4
+      - name: Build Windows installers
+        uses: ok-oldking/pyappify-action@c5cc8fe5c9bd5c732969018694a2645474c48b7e
         with:
-          lfs: true
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Set UTF-8 encoding
-        run: |
-          set PYTHONIOENCODING=utf-8
-          set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          echo PYTHONIOENCODING=utf-8 >> $GITHUB_ENV
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install cython setuptools polib
-
-      - name: inline_ok_requirements #把ok-script加入源码, 从requirements.txt中删除以提高升级更新速度
-        run: |
-          python -m ok.update.inline_ok_requirements --tag ${{ github.ref_name }}
-
-      - name: Sync Repositories # 同步部分代码(deploy.txt中), 合并tag中间更新日志, 到更新库, 以减少用户更新使用的git库大小
-        id: sync   # Give the step an ID to access its outputs
-        uses: ok-oldking/partial-sync-repo@master
-        with:
-          repos: |
-            https://cnb:${{ secrets.CNB_TOKEN }}@cnb.cool/ok-oldking/ok-gf2.git
-            https://alicejump:${{ secrets.GH_TOKEN }}@github.com/alicejump/ok-gf2-update.git
-          sync_list: 'deploy.txt'
-          tag: ${{ github.ref_name }}
-          gitignore_file: '.update_repo_gitignore'
-          show_author: true #在更新日志中加入作者
-
-  build:
-    needs: [test, sync]
-    runs-on: windows-latest
-    permissions:
-      contents: read
-
-    env:
-      PYTHONIOENCODING: 'UTF-8'
-
-    strategy:
-      matrix:
-        python-version: [ 3.12 ]
-
-    steps:
-      - name: Configure git
-        run: |
-          [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-          git config --global user.email "ok-oldking@users.noreply.github.com"
-          git config --global user.name "ok-oldking"
-          echo "action_state=yellow" >> $env:GITHUB_ENV
-          echo "${{ env.action_state }}"
-
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Set UTF-8 encoding
-        run: |
-          set PYTHONIOENCODING=utf-8
-          set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          echo PYTHONIOENCODING=utf-8 >> $GITHUB_ENV
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install cython setuptools polib
-
-      - name: inline_ok_requirements #把ok-script加入源码, 从requirements.txt中删除以提高升级更新速度
-        run: |
-          python -m ok.update.inline_ok_requirements --tag ${{ github.ref_name }}
-
-      - name: Build with PyAppify Action
-        id: build-app
-        uses: ok-oldking/pyappify-action@master #使用pyappify打包exe
-
-      - name: Add version to build filenames
+          version: v1.2.3
+      - name: Version artifacts and calculate checksums
         shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
         run: |
-          $version = "${{ github.ref_name }}"
-          Get-ChildItem -Path pyappify_dist -File | ForEach-Object {
-            Rename-Item -LiteralPath $_.FullName -NewName "$($_.BaseName)-$version$($_.Extension)"
+          Get-ChildItem -LiteralPath pyappify_dist -File | ForEach-Object {
+            Rename-Item -LiteralPath $_.FullName -NewName "$($_.BaseName)-$env:RELEASE_VERSION$($_.Extension)"
           }
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+          $installers = @(Get-ChildItem -LiteralPath pyappify_dist -Filter '*-setup-*.exe')
+          if ($installers.Count -lt 2) { throw 'Expected both full and online installers' }
+          Get-ChildItem -LiteralPath pyappify_dist -File | Sort-Object Name | ForEach-Object {
+            $hash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $($_.Name)"
+          } | Set-Content -LiteralPath pyappify_dist/SHA256SUMS.txt -Encoding utf8
+      - uses: actions/upload-artifact@v4
         with:
-          name: pyappify_dist-${{ github.ref_name }}
+          name: installers-${{ github.ref_name }}
           path: pyappify_dist/*
+          if-no-files-found: error
 
   release:
-    needs: [build, sync]
-    runs-on: windows-latest
+    needs: build
     if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: pyappify_dist-${{ github.ref_name }}
+          name: installers-${{ github.ref_name }}
           path: pyappify_dist
-
-      - name: Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
-          draft: false
+          name: '${{ github.ref_name }} · Dewcat 测试版'
+          prerelease: true
+          fail_on_unmatched_files: true
           body: |
-            ###  更新日志 ${{ needs.sync.outputs.start_tag }} -> ${{ needs.sync.outputs.end_tag }}:
-              ${{ needs.sync.outputs.changes_with_asterisk }}
-            ### 下载包说明 / Download Packages
-              * [ok-gf2-win32-china-setup-${{ github.ref_name }}.exe](https://github.com/AliceJump/ok-gf2/releases/download/${{ github.ref_name }}/ok-gf2-win32-china-setup-${{ github.ref_name }}.exe) 完整安装包（内含全部依赖，推荐国内用户或网络受限环境）/ Full installer (all dependencies included, recommended for users in China or with limited internet)
-              * [ok-gf2-win32-global-setup-${{ github.ref_name }}.exe](https://github.com/AliceJump/ok-gf2/releases/download/${{ github.ref_name }}/ok-gf2-win32-global-setup-${{ github.ref_name }}.exe) Github 源完整安装包（适合全球用户，依赖从GitHub下载）/ Github source whole setup (for global users, dependencies from GitHub)
-              * [ok-gf2-win32-online-setup-${{ github.ref_name }}.exe](https://github.com/AliceJump/ok-gf2/releases/download/${{ github.ref_name }}/ok-gf2-win32-online-setup-${{ github.ref_name }}.exe) 在线安装包（体积小，需联网下载依赖，建议先使用完整安装包）/ Online installer (small size, downloads dependencies online, recommended to use the full installer first)
-              * 不要下载SourceCode, Do Not Download the SourceCode
-            ### 如果无法下载可以使用, 其他下载源 / Alternative download sources
-              * [Mirror酱下载渠道](https://mirrorchyan.com/zh/projects?rid=okgf&source=ok-gf-release), 国内网页直链, 下载需要购买CD-KEY, 已有Mirror酱CD-KEY可免费下载 / Mainland China direct link, requires CD-KEY (free for existing Mirror users)
-              * [夸克网盘](https://pan.quark.cn/s/a1052cec4d13), 免费 / Free
-          files: pyappify_dist/**
+            基于 AliceJump/ok-gf2 的 Dewcat fork 测试版。
 
-  trigger_mirrorchyan:
-    needs: release
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    permissions:
-      actions: write
-      contents: read
-    steps:
-      - name: Trigger MirrorChyanUploading
-        shell: bash
-        run: |
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_uploading.yml -f tag=${{ github.ref_name }}
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note.yml
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - 活动层喝水、吃饭支持独立开关，保留领奖流程。
+            - 推图识别完成标记，优先处理上下支路，并改进地图导航恢复。
+            - 增加推图规划回归测试。
+            - 安装和更新来源为 Dewcat/ok-gf2。
+
+            下载 `ok-gf2-win32-dewcat-setup-${{ github.ref_name }}.exe` 完整安装包（包含 Python 和依赖）。
+            `online-setup` 为在线安装包，首次启动需要联网下载依赖。
+            `SHA256SUMS.txt` 提供附件校验值。Source code 为源码，不是安装包。
+
+            自动化检查已通过；本测试版尚未完成游戏内完整流程验证。
+          files: pyappify_dist/*

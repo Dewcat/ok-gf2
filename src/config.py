@@ -3,8 +3,8 @@ import os
 import numpy as np
 from ok import Config
 
-version = "dev"
-# 不需要修改version, Github Action打包会自动修改
+version = os.environ.get("PYAPPIFY_APP_VERSION", "dev")
+# 安装版从启动器读取版本；直接运行源码时显示 dev。
 
 config = {
     "debug": False,  # Optional, default: False

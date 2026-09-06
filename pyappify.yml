@@ -1,22 +1,12 @@
 name: "ok-gf2"
 uac: true
+website: "https://github.com/Dewcat/ok-gf2"
 profiles:
-  - name: "china"
-    git_url: "https://cnb.cool/ok-oldking/ok-gf2.git"
+  - name: "dewcat"
+    git_url: "https://github.com/Dewcat/ok-gf2.git"
     admin: true
     main_script: "main.py"
     requires_python: "3.12"
     requirements: "requirements.txt"
     use_pythonw: true
     show_add_defender: true
-    # PYTHONPATH: "your/default/path" # Optional, will be "" if missing
-    
-  - name: "global"
-    git_url: "https://github.com/AliceJump/ok-gf2-update.git"
-    admin: true
-    main_script: "main.py"
-    requires_python: "3.12"
-    requirements: "requirements.txt"
-    use_pythonw: true
-    show_add_defender: true
-    # PYTHONPATH: "your/default/path" # Optional, will be "" if missing
