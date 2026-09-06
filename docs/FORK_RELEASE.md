@@ -57,3 +57,22 @@ gh workflow run build.yml --repo Dewcat/ok-gf2 --ref v1.2.73
 
 定制的 PyAppify Action 位于 `.github/actions/pyappify`，保留上游来源与许可证。
 `compression: zlib` 只控制安装包压缩，不要求重编译启动器；相比 LZMA，完整包可能更大。
+
+## v1.2.74 实测（2026-09-06）
+
+对比 [v1.2.73 构建](https://github.com/Dewcat/ok-gf2/actions/runs/34012134141)
+与 [v1.2.74 构建](https://github.com/Dewcat/ok-gf2/actions/runs/34014403888)，均使用 `windows-latest`：
+
+| 指标 | v1.2.73 | v1.2.74 |
+| --- | --- | --- |
+| 工作流总耗时（创建到完成，包含发布） | 26 分 21 秒 | 7 分 22 秒 |
+| build 任务 | 25 分 32 秒 | 6 分 33 秒 |
+| Rust release 编译 | 11 分 25 秒 | 复用，跳过 |
+| 完整包 makensis 到 bundle 完成 | 9 分 26 秒 | 2 分 59 秒 |
+| 完整安装包字节数 | 386,076,980 | 524,597,875 |
+
+总耗时减少约 72%，NSIS 阶段减少约 68%，完整包体积增加约 36%。
+这是各一次云端运行的对比，包含依赖缓存、网络和 runner 波动，不代表严格受控基准。
+新版本日志确认 Zlib、生效的启动器 ZIP 校验值，以及包内 `current_version=v1.2.74`。
+复用 ZIP 的 SHA-256 与 v1.2.73 一致；发布附件的 GitHub digest 与 `SHA256SUMS.txt` 全部匹配。
+19 项 Python 测试与 4 项 Node 测试通过；尚未进行游戏内完整流程验证。
