@@ -24,7 +24,9 @@ git push fork refs/tags/v1.2.74
 
 - Windows runner 安装 Python 3.12 和项目依赖。
 - 在独立 Python 进程中执行 `tests/Test*.py`，也包括 `test_clear_map_planner.py`。
-- PyAppify 编译本 fork 启动器，生成完整安装包和在线安装包。
+- 根据 PyAppify 版本、构建配方、目标架构、`pyappify.yml` 和图标的哈希查找兼容启动器。
+- 复用本 fork Release 中 SHA-256 验证通过的启动器；没有匹配项时才编译。
+- 使用 Zlib 压缩生成完整安装包和在线安装包，并核对包内版本与发布标签一致。
 - 为附件添加版本号，生成 `SHA256SUMS.txt`，保存 Actions 构建产物。
 - 构建成功后自动创建 GitHub Release，当前默认标记为测试版。
 
@@ -45,3 +47,13 @@ gh workflow run build.yml --repo Dewcat/ok-gf2 --ref v1.2.73
 
 手动选择普通分支只构建 Actions 附件，选择版本标签才会创建 Release。
 此流程只需要仓库自带的 `GITHUB_TOKEN`，不需要上游的 CNB、GH_TOKEN 或 MirrorChyan 密钥。
+
+## 启动器复用
+
+`scripts/release_launcher.py` 将兼容性和附件校验信息写入 `launcher-manifest.json`。
+修改 Python 任务不会触发启动器重编译；修改图标或启动器配置则会。
+首个没有清单的 `v1.2.73` 仅在它仍指向已知的 `6f2141d` 提交、构建输入一致时允许复用。
+如果改变启动器的编译方法，需要同步更新脚本中的 `BINARY_RECIPE`，以使旧启动器失效。
+
+定制的 PyAppify Action 位于 `.github/actions/pyappify`，保留上游来源与许可证。
+`compression: zlib` 只控制安装包压缩，不要求重编译启动器；相比 LZMA，完整包可能更大。

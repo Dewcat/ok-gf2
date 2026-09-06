@@ -19,6 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -35,10 +36,28 @@ jobs:
             python -u -m unittest discover -s tests -p $_.Name -v
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
-      - name: Build Windows installers
-        uses: ok-oldking/pyappify-action@c5cc8fe5c9bd5c732969018694a2645474c48b7e
+      - name: Select compatible launcher
+        id: launcher
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/release_launcher.py prepare
+      - uses: actions/setup-node@v4
         with:
-          version: v1.2.3
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: .github/actions/pyappify/package-lock.json
+      - name: Install packaging action dependencies
+        run: npm ci --omit=dev --prefix .github/actions/pyappify
+      - name: Test packaging configuration
+        run: node --test .github/actions/pyappify/build-config.test.js
+      - name: Build Windows installers
+        uses: ./.github/actions/pyappify
+        with:
+          version: ${{ steps.launcher.outputs.version }}
+          use_release: ${{ steps.launcher.outputs.reuse_url }}
+          reuse_asset: ${{ steps.launcher.outputs.reuse_asset }}
+          reuse_sha256: ${{ steps.launcher.outputs.reuse_sha256 }}
+          compression: zlib
       - name: Version artifacts and calculate checksums
         shell: pwsh
         env:
@@ -47,6 +66,8 @@ jobs:
           Get-ChildItem -LiteralPath pyappify_dist -File | ForEach-Object {
             Rename-Item -LiteralPath $_.FullName -NewName "$($_.BaseName)-$env:RELEASE_VERSION$($_.Extension)"
           }
+          python scripts/release_launcher.py finalize
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $installers = @(Get-ChildItem -LiteralPath pyappify_dist -Filter '*-setup-*.exe')
           if ($installers.Count -lt 2) { throw 'Expected both full and online installers' }
           Get-ChildItem -LiteralPath pyappify_dist -File | Sort-Object Name | ForEach-Object {
@@ -78,6 +99,8 @@ jobs:
           body: |
             基于 AliceJump/ok-gf2 的 Dewcat fork 测试版。
 
+            - 修复 #68：启用启动后关闭启动器时，跳过延迟自动检查，避免启动器被反复拉起；手动检查保留。
+            - 复用配置匹配且校验通过的启动器，完整安装包改用 Zlib 压缩。
             - 活动层喝水、吃饭支持独立开关，保留领奖流程。
             - 推图识别完成标记，优先处理上下支路，并改进地图导航恢复。
             - 增加推图规划回归测试。

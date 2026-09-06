@@ -63,3 +63,8 @@ pip-log.txt
 pip-delete-this-directory.txt
 autohelper
 working_images/
+
+# Local release tooling
+node_modules/
+.release/
+pyappify_dist/

@@ -1,0 +1,48 @@
+name: PyAppify
+description: Use PyAppify to package your python app
+author: ok-oldking
+
+inputs:
+  version:
+    description: The tag version of pyappify to use. Defaults to the latest tag. Strongly recommended to set to ensure consistancy.
+    required: false
+  
+  use_release:
+    description: The github release version to use. Saves time for re-compiling and signing
+    required: false
+  
+  reuse_asset:
+    description: Exact launcher ZIP asset name from a compatible release
+    required: false
+  reuse_sha256:
+    description: Expected SHA-256 of the reused ZIP
+    required: false
+  compression:
+    description: NSIS compression algorithm
+    default: zlib
+  build_exe_only:
+    description: if enabled, will only build the build the exe and you can use the output exe-path to sign it. and the PyAppify action again to use the signed exe.
+    required: false
+    type: boolean
+    default: false
+
+outputs:
+  dist-path:
+    description: The path to the directory containing the zipped application bundles.
+
+  pyappify-assets:
+    description: The list of files to be released.
+
+  exe-path:
+    description: The tauri exe path
+
+  exe-folder:
+    description: The tauri exe's folder location
+
+runs:
+  using: 'node24'
+  main: 'index.js'
+
+branding:
+  icon: package
+  color: blue
