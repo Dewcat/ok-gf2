@@ -28,7 +28,7 @@ git push fork refs/tags/v1.2.74
 - 复用本 fork Release 中 SHA-256 验证通过的启动器；没有匹配项时才编译。
 - 使用 Zlib 压缩生成完整安装包和在线安装包，并核对包内版本与发布标签一致。
 - 为附件添加版本号，生成 `SHA256SUMS.txt`，保存 Actions 构建产物。
-- 构建成功后自动创建 GitHub Release，当前默认标记为测试版。
+- 构建成功后自动创建正式 GitHub Release，并设为 Latest。
 
 完整安装包名为 `ok-gf2-win32-dewcat-setup-版本号.exe`；
 在线安装包名为 `ok-gf2-win32-online-setup-版本号.exe`。

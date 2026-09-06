@@ -93,11 +93,12 @@ jobs:
           path: pyappify_dist
       - uses: softprops/action-gh-release@v2
         with:
-          name: '${{ github.ref_name }} · Dewcat 测试版'
-          prerelease: true
+          name: '${{ github.ref_name }} · Dewcat'
+          prerelease: false
+          make_latest: "true"
           fail_on_unmatched_files: true
           body: |
-            基于 AliceJump/ok-gf2 的 Dewcat fork 测试版。
+            基于 AliceJump/ok-gf2 的 Dewcat fork 正式版。
 
             - 修复 #68：启用启动后关闭启动器时，跳过延迟自动检查，避免启动器被反复拉起；手动检查保留。
             - 复用配置匹配且校验通过的启动器，完整安装包改用 Zlib 压缩。
@@ -110,5 +111,5 @@ jobs:
             `online-setup` 为在线安装包，首次启动需要联网下载依赖。
             `SHA256SUMS.txt` 提供附件校验值。Source code 为源码，不是安装包。
 
-            自动化检查已通过；本测试版尚未完成游戏内完整流程验证。
+            自动化检查已通过；本版本尚未完成游戏内完整流程验证。
           files: pyappify_dist/*
