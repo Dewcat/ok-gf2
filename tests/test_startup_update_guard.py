@@ -29,19 +29,22 @@ class StartupUpdateGuardTest(unittest.TestCase):
         window.about_tab.check_for_updates()
         check.assert_called_once_with()
 
-    def test_kept_launcher_still_gets_automatic_check(self):
+    def test_kept_launcher_does_not_get_automatic_check(self):
         window, callbacks, check = self.make_window(False)
         window._schedule_update_check()
-        self.assertEqual(1, len(callbacks))
-        callbacks[0]()
+        self.assertEqual([], callbacks)
+        check.assert_not_called()
+        window.about_tab.check_for_updates()
         check.assert_called_once_with()
 
-    def test_reads_current_setting_and_does_not_wrap_twice(self):
+    def test_setting_changes_do_not_enable_check_and_guard_is_idempotent(self):
         window, callbacks, _ = self.make_window(False)
         wrapped = window._schedule_update_check
         Globals.on_show_main_window(None, window)
         self.assertIs(wrapped, window._schedule_update_check)
         window.basic_global_config[KILL_LAUNCHER_AFTER_START] = True
+        window._schedule_update_check()
+        window.basic_global_config[KILL_LAUNCHER_AFTER_START] = False
         window._schedule_update_check()
         self.assertEqual([], callbacks)
 

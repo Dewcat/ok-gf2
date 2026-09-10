@@ -72,9 +72,10 @@ class DailyTask(CommunityMixin, BaseGfTask):
                 '自动进入限时开启活动并挑战物资关卡\n'
                 '关卡名称在"当前物资关卡名称"中配置'
             ),
-            '活动层': '活动层总开关；按下方独立开关执行喝水、吃饭，并领取奖励',
+            '活动层': '活动层总开关；按下方独立开关执行喝水、吃饭、浇花，并领取奖励',
             '活动层喝水': '独立控制喝水任务，关闭后跳过喝水',
             '活动层吃饭': '独立控制吃饭任务，关闭后跳过吃饭',
+            '活动层浇花': '独立控制栽培浇灌任务，关闭后跳过浇花；不施肥',
             '公共区/调度室': '自动完成公共区委托的派遣与领取',
             '自主循环': (
                 '开启后公共区将启动游戏内自主循环模式\n'
@@ -106,6 +107,7 @@ class DailyTask(CommunityMixin, BaseGfTask):
             '活动层': True,
             '活动层喝水': True,
             '活动层吃饭': True,
+            '活动层浇花': True,
             '公共区/调度室': True,
             '自主循环': False,
             '购买免费礼包': True,
@@ -137,7 +139,7 @@ class DailyTask(CommunityMixin, BaseGfTask):
         self.default_config_group.update({
             "社区每日": ["用户名", "密码"],
             "活动自律": ["当前物资关卡名称"],
-            "活动层": ["活动层喝水", "活动层吃饭"],
+            "活动层": ["活动层喝水", "活动层吃饭", "活动层浇花"],
             "活动层喝水": ["喝水"],
             "活动层吃饭": ["吃饭"],
             "公共区/调度室": ["自主循环"],
@@ -279,10 +281,13 @@ class DailyTask(CommunityMixin, BaseGfTask):
 
     def free_time_layer(self):
         self.info_set('current_task', 'free_time_layer')
-        for i in range(3):
+        completed = True
+        for i in range(4):
             if i == 0 and not self.config.get('活动层喝水', True):
                 continue
             if i == 1 and not self.config.get('活动层吃饭', True):
+                continue
+            if i == 2 and not self.config.get('活动层浇花', True):
                 continue
             self.wait_click_ocr(match='活动层', box=self.box.right, time_out=2, raise_if_not_found=True)
             if self.is_free_layer():
@@ -296,7 +301,7 @@ class DailyTask(CommunityMixin, BaseGfTask):
                         need_extra_confirm=False
                     )
 
-                elif i != 2:
+                elif i == 1:
                     self.do_food_flow(
                         enter_func=self.go_eat,
                         entry_match=re.compile('美味烹调'),
@@ -306,6 +311,9 @@ class DailyTask(CommunityMixin, BaseGfTask):
                         need_extra_confirm=True,
                         need_again_test=True
                     )
+                elif i == 2:
+                    if not self.water_flowers():
+                        completed = False
                 else:
                     self.send_key("f2", after_sleep=2)
                     self.wait_click_ocr(match=re.compile('领取'), box=self.box_of_screen(0.151, 0.772, 0.385, 0.883),
@@ -313,7 +321,26 @@ class DailyTask(CommunityMixin, BaseGfTask):
                     self.wait_pop_up(count=1)
             else:
                 self.log_error('没检测到活动层页面')
+                completed = False
             self.ensure_main(time_out=60)
+        return completed
+
+    def water_flowers(self):
+        self.info_set('current_task', 'water_flowers')
+        # 截图第一步的面板入口对应 F2，使用快捷键避免活动层鼠标锁定。
+        self.send_key('f2', after_sleep=2)
+        if not self.wait_click_ocr(match='栽培', box=self.box.top, time_out=10,
+                                   raise_if_not_found=False, after_sleep=2):
+            self.log_error('未找到栽培入口，跳过浇花')
+            return False
+        if not self.wait_click_ocr(match='浇灌', box=self.box.right, time_out=10,
+                                   raise_if_not_found=False, after_sleep=2):
+            self.log_error('未找到浇灌按钮，跳过浇花')
+            return False
+        self.wait_pop_up(count=1, time_out=5)
+        # 关闭栽培页面后，由活动层共用的 ensure_main 处理退出确认。
+        self.back(after_sleep=2)
+        return True
 
     def activities(self):
         self.info_set('current_task', 'activity_stamina')
