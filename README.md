@@ -7,7 +7,7 @@
   />
 </p>
 
-<h1 align="center">ok-gf2 · Dewcat</h1>
+<h1 align="center">OK-GF2 Enhanced</h1>
 
 <p>
 基于图像识别的少前2（Girls' Frontline 2）自动化程序，部分功能支持后台运行，基于 <a href="https://github.com/ok-oldking/ok-script">ok-script</a> 开发。
@@ -18,19 +18,45 @@ An image-recognition-based automation tool for Girls' Frontline 2, with backgrou
 <p><i>通过模拟 Windows 用户接口进行操作，无内存读取、无文件修改</i></p>
 
 
-本仓库是 [AliceJump/ok-gf2](https://github.com/AliceJump/ok-gf2) 的 Dewcat 维护分支，增加指定菜品、活动层浇花，并改进自主循环和启动器更新流程。
+**少前2：追放自动助手增强版，专注问题修复与日常体验。**
+
+本项目基于 [AliceJump/ok-gf2](https://github.com/AliceJump/ok-gf2)，针对从上游版本使用中遇到、尚待解决的多项问题提供修复，并持续补充实用功能。我们将以更频繁的维护和修复发布，积极跟进游戏变化与用户反馈。
+
+如果你希望获得更顺畅的日常自动化体验，或正在等待某个问题的修复，欢迎尝试 Enhanced 版。遇到问题、发现回归或有改进建议，都欢迎 [提交 Issue](https://github.com/Dewcat/ok-gf2-enhanced/issues)。
+
+**[下载最新版本](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest) · [问题反馈](https://github.com/Dewcat/ok-gf2-enhanced/issues) · [English](README_en.md)**
 
 <!-- Badges -->
 <div align="center">
 
 ![平台](https://img.shields.io/badge/platform-Windows-blue)
-[![GitHub release](https://img.shields.io/github/v/release/Dewcat/ok-gf2)](https://github.com/Dewcat/ok-gf2/releases/latest)
-[![总下载量](https://img.shields.io/github/downloads/Dewcat/ok-gf2/total)](https://github.com/Dewcat/ok-gf2/releases/latest)
+[![GitHub release](https://img.shields.io/github/v/release/Dewcat/ok-gf2-enhanced)](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest)
+[![总下载量](https://img.shields.io/github/downloads/Dewcat/ok-gf2-enhanced/total)](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AliceJump/ok-gf2)
 
 </div>
 
 ---
+
+## ✨ Enhanced 带来了什么
+
+以下为本分支已实现的修复与增强，具体版本变更见 [发布记录](https://github.com/Dewcat/ok-gf2-enhanced/releases)。
+
+| 方向 | 修复与增强 |
+| --- | --- |
+| 启动器 | 修复启动器被反复拉起的问题，调整启动时自动更新检查流程 |
+| 推图 | 改进完成标记识别、上下支路优先级和地图导航恢复 |
+| 活动层 | 喝水、吃饭、浇花支持独立开关，保留领奖流程，减少不必要的页面往返 |
+| 指定菜品 | 自动翻找并确认选中；找不到或未解锁时跳过吃饭，避免继续错误流程 |
+| 浇花 | 兼容栽培概览入口，按浇灌次数判断是否完成，避免误读施肥次数和重复浇水 |
+| 自主循环 | 无确认弹窗时继续执行，修复由此产生的误报与流程中断 |
+| 发布与验证 | 增加关键流程回归测试，自动构建完整及在线安装包，并提供 SHA256 校验文件 |
+
+### 维护与反馈
+
+本分支以持续修复和体验改进为维护重点，优先跟进影响日常使用的问题，并在修复后发布更新。欢迎用户提供可复现的反馈，也欢迎通过 Pull Request 贡献修复。
+
+自动化测试覆盖部分逻辑，实际识别效果仍会受到游戏版本、画面和运行环境影响；各版本的验证情况以发布说明为准。
 
 ## ⚠️ 免责声明
 
@@ -42,16 +68,16 @@ An image-recognition-based automation tool for Girls' Frontline 2, with backgrou
 
 ## 🚀 快速开始
 
-1. **下载安装包**：打开 [Dewcat 最新发布页](https://github.com/Dewcat/ok-gf2/releases/latest)，下载 `ok-gf2-win32-dewcat-setup-v版本号.exe` 完整安装包。
+1. **下载安装包**：打开 [增强版最新发布页](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest)，下载 `ok-gf2-win32-dewcat-setup-v版本号.exe` 完整安装包。
 2. **安装运行**：运行安装包，安装完成后启动 `ok-gf2`。
 3. **配置任务**：根据需求配置任务；在“活动层吃饭”下可填写“指定菜品”，留空使用默认菜品。
 
 ## 📥 下载渠道
 
-* **[Dewcat 最新版](https://github.com/Dewcat/ok-gf2/releases/latest)**：完整安装包包含 Python 和依赖，推荐首次使用者下载。
+* **[增强版最新版](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest)**：完整安装包包含 Python 和依赖，推荐首次使用者下载。
 * `ok-gf2-win32-online-setup-v版本号.exe` 是在线安装包，首次启动需联网下载依赖。
 * `SHA256SUMS.txt` 提供文件校验值；`Source code` 是源码，不是安装包。
-* 上游的 Mirror酱和网盘不提供此 Dewcat 版本。
+* 上游的 Mirror酱和网盘不提供本增强版。
 
 ## 运行要求与推荐设置
 
@@ -153,13 +179,20 @@ An image-recognition-based automation tool for Girls' Frontline 2, with backgrou
 4. **游戏帧率**：推荐 **120 FPS**，帧率越高越好。
 5. **游戏语言**：优先使用简体中文，英文可能有部分问题。
 6. **软件版本**：检查并确保您使用的是最新版本。
-7. **寻求帮助**：如果以上步骤都无法解决您的问题，请通过 QQ 群提交详细的错误报告。
+7. **寻求帮助**：如果以上步骤仍无法解决，请在 [本仓库 Issues](https://github.com/Dewcat/ok-gf2-enhanced/issues) 提交错误报告。
 
-## 💬 加入我们
+## 💬 问题反馈与参与
 
-* **QQ 交流群**：`1033950808`（入群答案：`老王同学OK`）
+请通过 [Issues](https://github.com/Dewcat/ok-gf2-enhanced/issues) 反馈本增强版的问题或提出功能建议。提交前可先搜索已有 Issue，看看是否已有解决方法或相关讨论。
 
-本项目基于 [ok-script](https://github.com/ok-oldking/ok-script) 框架开发，简单易维护。欢迎有兴趣的开发者使用 [ok-script](https://github.com/ok-oldking/ok-script) 开发您自己的自动化项目。
+为了更快定位问题，请附上：
+
+- 软件版本、游戏语言、分辨率和 Windows 版本；
+- 出问题的任务、相关设置，以及可复现的操作步骤；
+- 预期行为与实际表现；
+- 相关日志和截图，提交前请遮盖账号等个人信息。
+
+欢迎通过 Pull Request 提交修复、补充测试或完善文档。
 
 ## 🔗 使用 ok-script 的项目
 
@@ -246,16 +279,9 @@ python -m unittest tests/TestMain.py
 |------|------|
 | [主数据维护工作流](docs/update/主数据维护工作流.md) | 新增或调整游戏关卡、任务数据时使用 |
 
-## ❤️ 赞助与致谢
+## ❤️ 致谢
 
-### 赞助商 (Sponsors)
-
-[![爱发电](https://img.shields.io/badge/爱发电-赞助-blue?style=flat-square)](https://afdian.com/a/AliceJump)
-[![爱发电](https://img.shields.io/badge/爱发电-赞助-blue?style=flat-square)](https://afdian.com/a/ok-oldking)
-[![Patreon](https://img.shields.io/badge/Patreon-支持-orange?style=flat-square)](https://patreon.com/ok_oldking)
-[![PayPal](https://img.shields.io/badge/PayPal-捐赠-blue?style=flat-square)](https://www.paypal.com/ncp/payment/JWQBH7JZKNGCQ)
-
-### 致谢
+感谢 [AliceJump/ok-gf2](https://github.com/AliceJump/ok-gf2) 及其贡献者提供的项目基础，以及以下开源项目：
 
 * [ok-oldking/OnnxOCR](https://github.com/ok-oldking/OnnxOCR)
 * [zhiyiYo/PyQt-Fluent-Widgets](https://github.com/zhiyiYo/PyQt-Fluent-Widgets)

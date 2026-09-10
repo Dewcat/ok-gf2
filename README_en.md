@@ -7,7 +7,7 @@
   />
 </p>
 
-<h1 align="center">ok-gf2 · Dewcat</h1>
+<h1 align="center">OK-GF2 Enhanced</h1>
 
 <p>
 An image-recognition-based automation tool for Girls' Frontline 2, with background mode support, developed with <a href="https://github.com/ok-oldking/ok-script">ok-script</a>.
@@ -18,20 +18,46 @@ Automates parts of Girls' Frontline 2 via screen recognition and simulated user 
 <p><i>Operates by simulating Windows user input. No memory reading, no file modification.</i></p>
 
 
-This is the Dewcat fork of [AliceJump/ok-gf2](https://github.com/AliceJump/ok-gf2), adding dish selection and plant watering, with improvements to auto loop and launcher updates.
+**An enhanced Girls’ Frontline 2 automation assistant focused on bug fixes and everyday usability.**
+
+Built on [AliceJump/ok-gf2](https://github.com/AliceJump/ok-gf2), this project addresses multiple unresolved issues encountered with the upstream version and adds practical improvements. We aim to maintain it more frequently, publish fixes sooner, and actively follow up on game changes and user feedback.
+
+Try Enhanced if you want a smoother daily routine or are waiting for a fix to an issue you have encountered. Bug reports, regressions, and feature suggestions are welcome through [Issues](https://github.com/Dewcat/ok-gf2-enhanced/issues).
+
+**[Latest release](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest) · [Report an issue](https://github.com/Dewcat/ok-gf2-enhanced/issues)**
 
 <!-- Badges -->
 <div align="center">
 
 ![Platform](https://img.shields.io/badge/platform-Windows-blue)
-[![GitHub release](https://img.shields.io/github/v/release/Dewcat/ok-gf2)](https://github.com/Dewcat/ok-gf2/releases/latest)
-[![Total downloads](https://img.shields.io/github/downloads/Dewcat/ok-gf2/total)](https://github.com/Dewcat/ok-gf2/releases/latest)
+[![GitHub release](https://img.shields.io/github/v/release/Dewcat/ok-gf2-enhanced)](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest)
+[![Total downloads](https://img.shields.io/github/downloads/Dewcat/ok-gf2-enhanced/total)](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest)
 
 </div>
 
 ### [中文说明](README.md) | English Readme
 
 ---
+
+## ✨ What Enhanced Adds
+
+These fixes and improvements are implemented in this branch. See the [release notes](https://github.com/Dewcat/ok-gf2-enhanced/releases) for changes in each version.
+
+| Area | Fixes and improvements |
+| --- | --- |
+| Launcher | Fix repeated launcher reopening and adjust automatic update checks at startup |
+| Map clearing | Improve completion marker recognition, branch priorities, and navigation recovery |
+| Activity layer | Separate drinking, eating, and watering switches; preserve reward collection and reduce unnecessary navigation |
+| Dish selection | Search for and verify the selected dish; skip eating if it is missing or locked |
+| Plant watering | Handle the cultivation overview, verify watering counts separately from fertilizer counts, and skip completed watering |
+| Auto loop | Continue when no confirmation dialog appears, avoiding false failures and interruptions |
+| Releases and testing | Add regression tests, build full and online installers automatically, and provide SHA256 checksums |
+
+### Maintenance and Feedback
+
+We focus on ongoing fixes and usability improvements, prioritize issues affecting daily tasks, and release updates as fixes become available. Reproducible reports and pull requests are welcome.
+
+Automated tests cover parts of the logic. In-game recognition still depends on the game version, visuals, and runtime environment; consult each release for its validation status.
 
 ## ⚠️ Disclaimer
 
@@ -48,16 +74,16 @@ all potential risks.**
 
 ## 🚀 Quick Start
 
-1. **Download**: Open the [latest Dewcat release](https://github.com/Dewcat/ok-gf2/releases/latest) and download `ok-gf2-win32-dewcat-setup-vVERSION.exe`.
+1. **Download**: Open the [latest Enhanced release](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest) and download `ok-gf2-win32-dewcat-setup-vVERSION.exe`.
 2. **Install and run**: Run the installer, then launch `ok-gf2`.
 3. **Configure tasks**: Configure the tasks you need. Leave the dish selection setting blank to use the default dish.
 
 ## 📥 Download Sources
 
-* **[Latest Dewcat release](https://github.com/Dewcat/ok-gf2/releases/latest)**: The full installer includes Python and dependencies and is recommended for first-time users.
+* **[Latest Enhanced release](https://github.com/Dewcat/ok-gf2-enhanced/releases/latest)**: The full installer includes Python and dependencies and is recommended for first-time users.
 * `ok-gf2-win32-online-setup-vVERSION.exe` downloads dependencies on first launch.
 * `SHA256SUMS.txt` contains checksums. `Source code` archives are not installers.
-* Upstream mirrors do not distribute this Dewcat build.
+* Upstream mirrors do not distribute this Enhanced build.
 
 ## Runtime Requirements & Recommendations
 
@@ -111,14 +137,20 @@ If you encounter issues, check the following in order:
 4. **Game frame rate**: **120 FPS** recommended, higher is better.
 5. **Game language**: Simplified Chinese preferred, English may have issues.
 6. **Software version**: Ensure you're running the latest release.
-7. **Get help**: If all above fails, submit a detailed error report via the QQ group.
+7. **Get help**: If the issue persists, submit a report through [this repository’s Issues](https://github.com/Dewcat/ok-gf2-enhanced/issues).
 
-## 💬 Join Us
+## 💬 Feedback and Contributions
 
-* **QQ Group**: `1033950808` (answer: `老王同学OK`)
+Use [Issues](https://github.com/Dewcat/ok-gf2-enhanced/issues) for bugs and feature requests related to this Enhanced version. Search existing reports before opening a new one.
 
-This project is built on [ok-script](https://github.com/ok-oldking/ok-script), which is easy to maintain. Developers are
-welcome to build their own automation projects with ok-script.
+To help reproduce a problem, include:
+
+- App version, game language, resolution, and Windows version;
+- The affected task, relevant settings, and reproduction steps;
+- Expected and actual behavior;
+- Relevant logs and screenshots, with account details and other personal information removed.
+
+Pull requests with fixes, tests, and documentation improvements are welcome.
 
 ## 🔗 Projects using ok-script
 
@@ -185,14 +217,9 @@ ok-gf2.exe -t 1 -e
 | [i18n & OCR Configuration](docs/dev/i18n_OCR配置流程.md) | Runtime locale, language JSON, OCR matching, and text-fix workflow |
 | [Keyboard System](docs/dev/键盘操作体系.md) | Hotkey mapping, key binding conventions |
 
-## ❤️ Sponsors & Acknowledgements
+## ❤️ Acknowledgements
 
-### Sponsors
-
-[![Patreon](https://img.shields.io/badge/Patreon-Support-orange?style=flat-square)](https://patreon.com/ok_oldking)
-[![PayPal](https://img.shields.io/badge/PayPal-Donate-blue?style=flat-square)](https://www.paypal.com/ncp/payment/JWQBH7JZKNGCQ)
-
-### Acknowledgements
+Thanks to [AliceJump/ok-gf2](https://github.com/AliceJump/ok-gf2) and its contributors for the foundation of this project, and to the following open-source projects:
 
 * [ok-oldking/OnnxOCR](https://github.com/ok-oldking/OnnxOCR)
 * [zhiyiYo/PyQt-Fluent-Widgets](https://github.com/zhiyiYo/PyQt-Fluent-Widgets)
