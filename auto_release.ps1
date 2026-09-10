@@ -204,7 +204,7 @@ function Push-GitTag {
 
     try {
 
-        git push origin $tag 2>&1 | Out-Null
+        git push fork $tag 2>&1 | Out-Null
 
         if ($LASTEXITCODE -ne 0) {
             Write-Host "✗ 推送标签失败" -ForegroundColor Red
@@ -247,7 +247,7 @@ if ($DryRun) {
 
     Write-Host "🔍 演习模式：" -ForegroundColor Yellow
     Write-Host "  创建标签: $nextTag"
-    Write-Host "  推送命令: git push origin $nextTag"
+    Write-Host "  推送命令: git push fork $nextTag"
 
     exit 0
 }
@@ -269,7 +269,7 @@ if ($response -ieq "n") {
 Write-Host ""
 Write-Host "⟳ 推送最新 commit..." -ForegroundColor Cyan
 
-git push 2>&1 | Out-Null
+git push fork HEAD:master 2>&1 | Out-Null
 
 if ($LASTEXITCODE -ne 0) {
 
@@ -288,7 +288,7 @@ if (-not (New-GitTag $nextTag $message)) {
 if (-not (Push-GitTag $nextTag)) {
 
     Write-Host "⚠ 标签已创建但推送失败，可手动执行：" -ForegroundColor Yellow
-    Write-Host "git push origin $nextTag"
+    Write-Host "git push fork $nextTag"
 
     exit 1
 }

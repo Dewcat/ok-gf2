@@ -75,6 +75,7 @@ class DailyTask(CommunityMixin, BaseGfTask):
             '活动层': '活动层总开关；按下方独立开关执行喝水、吃饭、浇花，并领取奖励',
             '活动层喝水': '独立控制喝水任务，关闭后跳过喝水',
             '活动层吃饭': '独立控制吃饭任务，关闭后跳过吃饭',
+            '指定菜品': '填写常规菜品完整名称，如九转大肠；留空使用默认菜品。自动翻找，未找到或未解锁则跳过吃饭',
             '活动层浇花': '独立控制栽培浇灌任务，关闭后跳过浇花；不施肥',
             '公共区/调度室': '自动完成公共区委托的派遣与领取',
             '自主循环': (
@@ -99,6 +100,7 @@ class DailyTask(CommunityMixin, BaseGfTask):
             '密码': "",
             '喝水': '1.087-1.4-0.5',
             '吃饭': '1.0',
+            '指定菜品': '',
             "社区每日": False,
             '邮件': True,
             '情报和战前补给': True,
@@ -141,7 +143,7 @@ class DailyTask(CommunityMixin, BaseGfTask):
             "活动自律": ["当前物资关卡名称"],
             "活动层": ["活动层喝水", "活动层吃饭", "活动层浇花"],
             "活动层喝水": ["喝水"],
-            "活动层吃饭": ["吃饭"],
+            "活动层吃饭": ["吃饭", "指定菜品"],
             "公共区/调度室": ["自主循环"],
             "自主循环跳过项": ["自动刷体力", "刷钱本", "竞技场"],
             "购买免费礼包": ["商店心愿单购买"],
@@ -252,7 +254,8 @@ class DailyTask(CommunityMixin, BaseGfTask):
             second_btn,
             skip_end_match,
             need_extra_confirm=False,
-            need_again_test=False
+            need_again_test=False,
+            before_main=None
     ):
         enter_func(after_sleep=1)
         times = 1
@@ -263,7 +266,11 @@ class DailyTask(CommunityMixin, BaseGfTask):
                 self.click_with_key('alt', result)
             else:
                 return False
-            if self.wait_click_ocr(match=main_btn, box=self.box.bottom_right, time_out=10):
+            if self.wait_ocr(match=main_btn, box=self.box.bottom_right, time_out=10):
+                if before_main is not None and not before_main():
+                    return False
+                if not self.wait_click_ocr(match=main_btn, box=self.box.bottom_right, time_out=3):
+                    return False
                 if self.wait_click_ocr(match=second_btn, time_out=3, after_sleep=2):
                     if need_extra_confirm:
                         self.wait_click_ocr(match='确认', time_out=3, after_sleep=1)
@@ -279,20 +286,56 @@ class DailyTask(CommunityMixin, BaseGfTask):
                     return False
         return False
 
+    def select_food(self):
+        dish = re.sub(r'\s+', '', self.config.get('指定菜品', '') or '')
+        if not dish:
+            return True
+        # 包含匹配：允许菜名前后混入图标字符，以及文字之间的空格。
+        dish_match = re.compile(r'\s*'.join(re.escape(c) for c in dish))
+        grid = self.box_of_screen(0.20, 0.20, 0.56, 0.75)
+        detail = self.box_of_screen(0.58, 0.19, 0.72, 0.26)
+        self.scroll_relative(0.48, 0.45, 30)
+        self.sleep(1)
+        for page in range(12):
+            boxes = self.wait_ocr(match=dish_match, box=grid, time_out=2,
+                                  raise_if_not_found=False, log=True)
+            if boxes:
+                card = boxes[0]
+                center_x = (card.x + card.width / 2) / self.width
+                name_bottom = (card.y + card.height) / self.height
+                status = self.box_of_screen(center_x - 0.033, name_bottom,
+                                             center_x + 0.033, min(name_bottom + 0.04, 0.755))
+                if self.wait_ocr(match=re.compile('可解锁|未解锁'), box=status, time_out=1,
+                                 raise_if_not_found=False):
+                    self.log_error(f'指定菜品「{dish}」未解锁，跳过吃饭')
+                    return False
+                self.click(card, after_sleep=1)
+                if self.wait_ocr(match=dish_match, box=detail, time_out=3,
+                                 raise_if_not_found=False, log=True):
+                    self.log_info(f'已选择菜品：{dish}')
+                    return True
+                self.log_error(f'未确认选中菜品「{dish}」，跳过吃饭')
+                return False
+            if page < 11:
+                self.scroll_relative(0.48, 0.45, -3)
+                self.sleep(1)
+        self.log_error(f'未找到指定菜品「{dish}」，跳过吃饭；请检查完整名称及是否已解锁')
+        return False
+
     def free_time_layer(self):
         self.info_set('current_task', 'free_time_layer')
         completed = True
-        for i in range(4):
-            if i == 0 and not self.config.get('活动层喝水', True):
-                continue
-            if i == 1 and not self.config.get('活动层吃饭', True):
-                continue
-            if i == 2 and not self.config.get('活动层浇花', True):
-                continue
-            self.wait_click_ocr(match='活动层', box=self.box.right, time_out=2, raise_if_not_found=True)
+        enabled_steps = [i for i, key in enumerate(('活动层喝水', '活动层吃饭', '活动层浇花'))
+                         if self.config.get(key, True)] + [3]
+        reuse_layer = False
+        for position, i in enumerate(enabled_steps):
+            if not reuse_layer:
+                self.wait_click_ocr(match='活动层', box=self.box.right, time_out=2, raise_if_not_found=True)
+            reuse_layer = False
+            food_completed = False
             if self.is_free_layer():
                 if i == 0:
-                    self.do_food_flow(
+                    food_completed = self.do_food_flow(
                         enter_func=self.go_drink,
                         entry_match=re.compile('茶歇一刻'),
                         main_btn='制作',
@@ -302,14 +345,15 @@ class DailyTask(CommunityMixin, BaseGfTask):
                     )
 
                 elif i == 1:
-                    self.do_food_flow(
+                    food_completed = self.do_food_flow(
                         enter_func=self.go_eat,
                         entry_match=re.compile('美味烹调'),
                         main_btn='下一步',
                         second_btn='确认邀请',
                         skip_end_match=['前往战役'],
                         need_extra_confirm=True,
-                        need_again_test=True
+                        need_again_test=True,
+                        before_main=self.select_food
                     )
                 elif i == 2:
                     if not self.water_flowers():
@@ -322,25 +366,58 @@ class DailyTask(CommunityMixin, BaseGfTask):
             else:
                 self.log_error('没检测到活动层页面')
                 completed = False
-            self.ensure_main(time_out=60)
+            if i in (0, 1) and not food_completed:
+                completed = False
+            next_step = enabled_steps[position + 1] if position + 1 < len(enabled_steps) else None
+            # 走路任务之间仍需重置起点；只有紧接浇花时才复用当前活动层。
+            if i in (0, 1) and food_completed and next_step == 2:
+                reuse_layer = self.is_free_layer(time_out=3)
+                if reuse_layer:
+                    self.log_info('留在活动层，继续执行浇花')
+            if not reuse_layer:
+                self.ensure_main(time_out=60)
         return completed
 
     def water_flowers(self):
         self.info_set('current_task', 'water_flowers')
-        # 截图第一步的面板入口对应 F2，使用快捷键避免活动层鼠标锁定。
         self.send_key('f2', after_sleep=2)
-        if not self.wait_click_ocr(match='栽培', box=self.box.top, time_out=10,
-                                   raise_if_not_found=False, after_sleep=2):
+        # 图标可能被 OCR 合并为“上栽培”；只在页签区域做包含匹配。
+        if not self.wait_click_ocr(match=re.compile(r'栽\s*培'),
+                                   box=self.box_of_screen(0.30, 0.15, 0.42, 0.25),
+                                   time_out=10, raise_if_not_found=False, after_sleep=2, log=True):
             self.log_error('未找到栽培入口，跳过浇花')
             return False
-        if not self.wait_click_ocr(match='浇灌', box=self.box.right, time_out=10,
-                                   raise_if_not_found=False, after_sleep=2):
+        watering_match = re.compile(r'浇\s*灌')
+        if not self.wait_ocr(match=watering_match, box=self.box.right, time_out=3,
+                             raise_if_not_found=False):
+            # 部分界面先显示栽培概览，需点击“前往”才进入花盆页面。
+            if not self.wait_click_ocr(match=re.compile('前往'), box=self.box.bottom_right,
+                                       time_out=5, raise_if_not_found=False, after_sleep=3, log=True):
+                self.log_error('栽培页面未找到浇灌或前往入口')
+                return False
+        if not self.wait_ocr(match=watering_match, box=self.box.right, time_out=10,
+                             raise_if_not_found=False):
+            self.log_error('未进入浇灌页面，跳过浇花')
+            return False
+        # 仅检查浇灌按钮下方次数，避免把施肥的 1/1 当成浇水完成。
+        count_box = self.box_of_screen(0.75, 0.51, 0.87, 0.59)
+        done_match = re.compile(r'^\s*1\s*[/／]\s*1\s*$')
+        if self.wait_ocr(match=done_match, box=count_box, time_out=1, raise_if_not_found=False):
+            self.log_info('今日已浇灌，跳过重复浇花')
+            self.back(after_sleep=2)
+            return True
+        if not self.wait_click_ocr(match=watering_match, box=self.box.right, time_out=5,
+                                   raise_if_not_found=False, after_sleep=2, log=True):
             self.log_error('未找到浇灌按钮，跳过浇花')
             return False
         self.wait_pop_up(count=1, time_out=5)
+        completed = bool(self.wait_ocr(match=done_match, box=count_box, time_out=10,
+                                       raise_if_not_found=False, log=True))
+        if not completed:
+            self.log_error('点击浇灌后未检测到次数 1/1，浇花未确认完成')
         # 关闭栽培页面后，由活动层共用的 ensure_main 处理退出确认。
         self.back(after_sleep=2)
-        return True
+        return completed
 
     def activities(self):
         self.info_set('current_task', 'activity_stamina')
@@ -628,14 +705,16 @@ class DailyTask(CommunityMixin, BaseGfTask):
         ):
             return
 
-        # 步骤 3: 点击"确认"，带重试
-        self._auto_loop_step_with_retry(
-            step_num=3,
-            match=["确认"],
-            box=self.box.center,
-            settle_time=2,
-            after_sleep=2,
-        )
+        # 步骤 3: 部分情况下直接开始循环，仅在出现确认弹窗时处理。
+        if self.wait_ocr(match=["确认"], box=self.box.center, time_out=3,
+                         raise_if_not_found=False):
+            if not self._auto_loop_step_with_retry(
+                step_num=3,
+                match=["确认"],
+                box=self.box.center,
+                after_sleep=2,
+            ):
+                return
         # 步骤 4: 等待"循环结束"出现并点击（仅作为一次识别完成的角色，不需要重试）
         if not self.wait_click_ocr(
             match=re.compile("循环结束"), time_out=600, box=self.box.top, after_sleep=2, log=True

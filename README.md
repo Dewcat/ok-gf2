@@ -7,7 +7,7 @@
   />
 </p>
 
-<h1 align="center">ok-gf2</h1>
+<h1 align="center">ok-gf2 · Dewcat</h1>
 
 <p>
 基于图像识别的少前2（Girls' Frontline 2）自动化程序，部分功能支持后台运行，基于 <a href="https://github.com/ok-oldking/ok-script">ok-script</a> 开发。
@@ -18,12 +18,14 @@ An image-recognition-based automation tool for Girls' Frontline 2, with backgrou
 <p><i>通过模拟 Windows 用户接口进行操作，无内存读取、无文件修改</i></p>
 
 
+本仓库是 [AliceJump/ok-gf2](https://github.com/AliceJump/ok-gf2) 的 Dewcat 维护分支，增加指定菜品、活动层浇花，并改进自主循环和启动器更新流程。
+
 <!-- Badges -->
 <div align="center">
 
 ![平台](https://img.shields.io/badge/platform-Windows-blue)
-[![GitHub release](https://img.shields.io/github/v/release/alicejump/ok-gf2)](https://github.com/alicejump/ok-gf2/releases)
-[![总下载量](https://img.shields.io/github/downloads/alicejump/ok-gf2/total)](https://github.com/alicejump/ok-gf2/releases)
+[![GitHub release](https://img.shields.io/github/v/release/Dewcat/ok-gf2)](https://github.com/Dewcat/ok-gf2/releases/latest)
+[![总下载量](https://img.shields.io/github/downloads/Dewcat/ok-gf2/total)](https://github.com/Dewcat/ok-gf2/releases/latest)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AliceJump/ok-gf2)
 
 </div>
@@ -40,15 +42,16 @@ An image-recognition-based automation tool for Girls' Frontline 2, with backgrou
 
 ## 🚀 快速开始
 
-1. **下载安装包**：从下方的"下载渠道"中选择一个，下载最新的 `ok-gf2` 压缩包。
-2. **解压运行**：解压后双击 `ok-gf2.exe` 即可运行，下载后可应用内更新。
-3. **配置任务**：根据需求在软件界面配置任务参数并执行。
+1. **下载安装包**：打开 [Dewcat 最新发布页](https://github.com/Dewcat/ok-gf2/releases/latest)，下载 `ok-gf2-win32-dewcat-setup-v版本号.exe` 完整安装包。
+2. **安装运行**：运行安装包，安装完成后启动 `ok-gf2`。
+3. **配置任务**：根据需求配置任务；在“活动层吃饭”下可填写“指定菜品”，留空使用默认菜品。
 
 ## 📥 下载渠道
 
-* **[GitHub](https://github.com/alicejump/ok-gf2/releases)**: 官方发布页，全球访问速度快。（**请下载 `7z` 压缩包，而不是 `Source Code` 源码压缩包**）
-* **[Mirror酱](https://mirrorchyan.com/zh/projects?rid=okgf2&source=okgf2readme)**: 国内镜像，下载可能需要购买其平台的 CD-KEY。
-* **[夸克网盘](https://pan.quark.cn/s/a1052cec4d13)**: 免费下载（需注册并下载夸克网盘客户端）
+* **[Dewcat 最新版](https://github.com/Dewcat/ok-gf2/releases/latest)**：完整安装包包含 Python 和依赖，推荐首次使用者下载。
+* `ok-gf2-win32-online-setup-v版本号.exe` 是在线安装包，首次启动需联网下载依赖。
+* `SHA256SUMS.txt` 提供文件校验值；`Source code` 是源码，不是安装包。
+* 上游的 Mirror酱和网盘不提供此 Dewcat 版本。
 
 ## 运行要求与推荐设置
 

@@ -7,7 +7,7 @@
   />
 </p>
 
-<h1 align="center">ok-gf2</h1>
+<h1 align="center">ok-gf2 · Dewcat</h1>
 
 <p>
 An image-recognition-based automation tool for Girls' Frontline 2, with background mode support, developed with <a href="https://github.com/ok-oldking/ok-script">ok-script</a>.
@@ -18,12 +18,14 @@ Automates parts of Girls' Frontline 2 via screen recognition and simulated user 
 <p><i>Operates by simulating Windows user input. No memory reading, no file modification.</i></p>
 
 
+This is the Dewcat fork of [AliceJump/ok-gf2](https://github.com/AliceJump/ok-gf2), adding dish selection and plant watering, with improvements to auto loop and launcher updates.
+
 <!-- Badges -->
 <div align="center">
 
 ![Platform](https://img.shields.io/badge/platform-Windows-blue)
-[![GitHub release](https://img.shields.io/github/v/release/alicejump/ok-gf2)](https://github.com/alicejump/ok-gf2/releases)
-[![Total downloads](https://img.shields.io/github/downloads/alicejump/ok-gf2/total)](https://github.com/alicejump/ok-gf2/releases)
+[![GitHub release](https://img.shields.io/github/v/release/Dewcat/ok-gf2)](https://github.com/Dewcat/ok-gf2/releases/latest)
+[![Total downloads](https://img.shields.io/github/downloads/Dewcat/ok-gf2/total)](https://github.com/Dewcat/ok-gf2/releases/latest)
 
 </div>
 
@@ -46,15 +48,16 @@ all potential risks.**
 
 ## 🚀 Quick Start
 
-1. **Download the package**: Choose a source below and download the latest `ok-gf2` archive.
-2. **Extract and run**: Extract the archive and double-click `ok-gf2.exe` to run.
-3. **Configure tasks**: Set up task parameters in the software interface as needed.
+1. **Download**: Open the [latest Dewcat release](https://github.com/Dewcat/ok-gf2/releases/latest) and download `ok-gf2-win32-dewcat-setup-vVERSION.exe`.
+2. **Install and run**: Run the installer, then launch `ok-gf2`.
+3. **Configure tasks**: Configure the tasks you need. Leave the dish selection setting blank to use the default dish.
 
 ## 📥 Download Sources
 
-* **[GitHub](https://github.com/alicejump/ok-gf2/releases)**: Official release page with fast global access. (**Download the `7z` archive, not the `Source Code` archive**)
-* **[Mirrorchyan](https://mirrorchyan.com/zh/projects?rid=okgf2&source=okgf2readme)**: China mirror (may require a CD-KEY purchase).
-* **[Quark Drive](https://pan.quark.cn/s/a1052cec4d13)**: Free download (requires registration and Quark Drive client).
+* **[Latest Dewcat release](https://github.com/Dewcat/ok-gf2/releases/latest)**: The full installer includes Python and dependencies and is recommended for first-time users.
+* `ok-gf2-win32-online-setup-vVERSION.exe` downloads dependencies on first launch.
+* `SHA256SUMS.txt` contains checksums. `Source code` archives are not installers.
+* Upstream mirrors do not distribute this Dewcat build.
 
 ## Runtime Requirements & Recommendations
 
